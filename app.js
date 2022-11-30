@@ -1,4 +1,6 @@
 //jshint esversion:6
+// Install the package dotenv
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -7,6 +9,9 @@ const mongoose = require("mongoose");
 const encrypt = require("mongoose-encryption");
 
 const app = express();
+
+// Get the information of the environment file
+console.log(process.env.API_KEY);
 
 app.set('view engine', 'ejs');
 
@@ -23,9 +28,10 @@ const userSchema = new mongoose.Schema({
 });
 
 // Check the documentation for mongoose-encryption
-const secret = "Thisisourlittlesecret.";
+// Create the next line as environment variable in the .env file
+// const secret = "Thisisourlittlesecret.";
 // The next line will only encrypt the password because of the encryptedFields
-userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
+userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] });
 
 const User = mongoose.model("User", userSchema);
 
