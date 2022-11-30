@@ -3,6 +3,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+// Install the package mongoose-encryption
+const encrypt = require("mongoose-encryption");
 
 const app = express();
 
@@ -19,6 +21,11 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String
 });
+
+// Check the documentation for mongoose-encryption
+const secret = "Thisisourlittlesecret.";
+// The next line will only encrypt the password because of the encryptedFields
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] });
 
 const User = mongoose.model("User", userSchema);
 
