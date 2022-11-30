@@ -7,6 +7,8 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 // Install the package mongoose-encryption
 const encrypt = require("mongoose-encryption");
+// Install the package md5
+const md5 = require("md5");
 
 const app = express();
 
@@ -31,7 +33,9 @@ const userSchema = new mongoose.Schema({
 // Create the next line as environment variable in the .env file
 // const secret = "Thisisourlittlesecret.";
 // The next line will only encrypt the password because of the encryptedFields
-userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] });
+// userSchema.plugin(encrypt, { secret: process.env.SECRET, encryptedFields: ["password"] });
+// The previous line is not needed anymore since the encryption is changed
+// to a hashed methodology instead of encryption with a key
 
 const User = mongoose.model("User", userSchema);
 
@@ -53,7 +57,8 @@ app.get("/register", function(req, res){
 app.post("/register", function(req, res){
   const newUser = new User({
     email: req.body.username,
-    password: req.body.password
+    // This next line will send the password hashed instead of plain text
+    password: md5(req.body.password)
   });
 
   newUser.save(function(err){
@@ -68,7 +73,7 @@ app.post("/register", function(req, res){
 
 app.post("/login", function(req, res){
   const username = req.body.username;
-  const password = req.body.password;
+  const password = md5(req.body.password);
   User.findOne({email: username}, function(err, foundUser){
     if (!err){
       if (foundUser) {
